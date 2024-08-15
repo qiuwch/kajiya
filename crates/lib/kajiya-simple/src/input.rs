@@ -58,6 +58,7 @@ impl KeyboardState {
 pub struct MouseState {
     pub physical_position: PhysicalPosition<f64>,
     pub delta: Vec2,
+    pub previous: Vec2,
     pub buttons_held: u32,
     pub buttons_pressed: u32,
     pub buttons_released: u32,
@@ -68,6 +69,7 @@ impl Default for MouseState {
         Self {
             physical_position: PhysicalPosition { x: 0.0, y: 0.0 },
             delta: Vec2::ZERO,
+            previous: Vec2::ZERO,
             buttons_held: 0,
             buttons_pressed: 0,
             buttons_released: 0,
@@ -80,12 +82,14 @@ impl MouseState {
         self.buttons_pressed = 0;
         self.buttons_released = 0;
         self.delta = Vec2::ZERO;
+        // self.previous = Vec2::ZERO;
 
         for event in events {
             match event {
                 Event::WindowEvent { event, .. } => match event {
                     WindowEvent::CursorMoved { position, .. } => {
                         self.physical_position = *position;
+                        println!("physical x:{0}, y:{1}", self.physical_position.x, self.physical_position.y);
                     }
                     WindowEvent::MouseInput { state, button, .. } => {
                         let button_id = match button {
@@ -109,8 +113,26 @@ impl MouseState {
                     device_id: _,
                     event: winit::event::DeviceEvent::MouseMotion { delta },
                 } => {
-                    self.delta.x += delta.0 as f32;
-                    self.delta.y += delta.1 as f32;
+                    // println!("delta x:{0}, y:{1}", self.delta.x, self.delta.y);
+                    // println!("delta x:{0}, y:{1}", delta.0, delta.1);
+
+                    // self.delta.x += delta.0 as f32;
+                    // self.delta.y += delta.1 as f32;
+                    let x = (delta.0 as f32) - self.previous.x;
+                    let y = (delta.1 as f32) - self.previous.y;
+
+                    println!("previous x:{0}, y:{1}", self.previous.x, self.previous.y);
+                    println!("input delta x:{0}, y:{1}", delta.0, delta.1);
+                    println!("compute delta x:{0}, y:{1}", x, y);
+
+                    if x == 0.0 && y == 0.0 {
+                        return;
+                    }
+
+                    self.delta.x = x;
+                    self.delta.y = y;
+                    self.previous.x = delta.0 as f32;
+                    self.previous.y = delta.1 as f32;
                 }
                 _ => (),
             }

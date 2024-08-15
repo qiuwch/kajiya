@@ -218,6 +218,10 @@ impl RuntimeState {
                 .clamp_length_max(1.0)
             * 4.0f32.powf(input["boost"]);
 
+        // println!("grab cursor x: {0}, y: {1}", self.grab_cursor_pos.x, self.grab_cursor_pos.y);
+        // println!("update camera delta x:{0}, y:{1}", self.mouse.delta.x, self.mouse.delta.y);
+        // println!("physical x:{0}, y:{1}", self.mouse.physical_position.x, self.mouse.physical_position.y);
+
         if (self.mouse.buttons_held & (1 << 2)) != 0 {
             // While we're rotating, the cursor should not move, so that upon revealing it,
             // it will be where we started the rotation motion at.
